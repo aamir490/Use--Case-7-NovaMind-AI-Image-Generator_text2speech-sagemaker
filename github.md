@@ -119,4 +119,85 @@ Browser displays generated image
 
 ---
 
+---
+
+## Git Commands Used for This Project
+
+### First Time Setup (already done)
+```bash
+# Initialize git repository
+git init
+
+# Check if any remote already exists
+git remote -v
+
+# Add GitHub remote
+git remote add origin https://github.com/aamir490/Use--Case-7-NovaMind-AI-Image-Generator_text2speech-sagemaker.git
+
+# Stage specific files
+git add index.html endpoint_call_function.py start_process_function.py display_image.py steps_to_do.md github.md ReadersAreTheLeaders.txt Bucket_Policy_S3.json Bucket_Policy_S3_cloudfront.json mylogo.png cloudage_logo.jpeg text-image-generative-ai-api-prod-swagger-apigateway.json text_2_image_with_generative_ai.ipynb text_2_image_with_generative_ai_new_aamir-vey-final.ipynb
+
+# Commit with message
+git commit -m "NovaMind AI Image Generator - AWS Stable Diffusion text-to-image app"
+
+# Push to GitHub and set upstream tracking
+git push -u origin master
+```
+
+---
+
+### Everyday Commands (use these going forward)
+
+```bash
+# Check current status — see what files changed
+git status
+
+# Check remote URL
+git remote -v
+
+# Stage all changed files
+git add .
+
+# Stage a specific file only
+git add index.html
+
+# Commit staged changes
+git commit -m "your message here"
+
+# Push to GitHub
+git push
+
+# Pull latest changes from GitHub
+git pull
+
+# View commit history
+git log --oneline
+```
+
+---
+
+### If You Need to Update Remote URL
+```bash
+# Remove old remote
+git remote remove origin
+
+# Add new remote
+git remote add origin https://github.com/your-new-repo-url.git
+
+# Verify
+git remote -v
+```
+
+---
+
+### Push Updated Files After Changes
+```bash
+# After editing any file (e.g. index.html), run:
+git add index.html
+git commit -m "update index.html - describe what changed"
+git push
+```
+
+---
+
 *All Praise Be To Almighty GOD Alone.*
