@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaMind AI Image Generator</title>
+    <meta name="description" content="Generate stunning AI images from text prompts instantly. Fast, free, and easy-to-use text-to-image generator powered by generative AI. Try it now!">
+    <meta name="keywords" content="AI image generator, text to image, generative AI, create images from text, free AI art, NovaMind, stable diffusion, prompt to image">
+    <meta name="author" content="NovaMind AI">
+    <meta property="og:title" content="NovaMind AI Image Generator">
+    <meta property="og:description" content="Generate stunning AI images from your text prompts. Fast, free, and easy-to-use.">
+    <meta property="og:image" content="mylogo.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NovaMind AI Image Generator">
+    <meta name="twitter:description" content="Generate stunning AI images from your text prompts. Fast, free, and easy-to-use.">
+    <meta name="twitter:image" content="mylogo.png">
+    <link rel="icon" href="mylogo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-accent: #667eea;
+            --success-color: #48bb78;
+            --error-color: #f56565;
+            --warning-color: #ed8936;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: var(--background-gradient);
+            background-size: 400% 400%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: gradientShift 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.15"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.15"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.15"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 500px;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy), 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: var(--shadow-medium);
+            border: 3px solid white;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        h1, h2 {
+            margin: 0 0 24px 0;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            transition: var(--transition);
+            resize: vertical;
+            min-height: 120px;
+            max-height: 300px;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea::placeholder {
+            color: #a0aec0;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .button-container {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-container {
+            width: 100%;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .status {
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .status.success { color: var(--success-color); }
+        .status.error { color: var(--error-color); }
+        .status.warning { color: var(--warning-color); }
+        .status.info { color: var(--text-accent); }
+
+        .timer {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+            background: #f7fafc;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid var(--text-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .image-container {
+            width: 100%;
+            margin-top: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            display: none;
+            position: relative;
+        }
+
+        #outputImage {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .download-btn {
+            background: white;
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .download-btn:hover {
+            background: #f7fafc;
+            transform: scale(1.05);
+        }
+
+        .note {
+            margin-top: 32px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            border-left: 4px solid var(--text-accent);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 2;
+            position: relative;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* Configuration panel */
+        .config-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-medium);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+        }
+
+        .config-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            box-shadow: var(--shadow-medium);
+            z-index: 1001;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .config-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+
+        .config-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .retry-container {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .retry-btn {
+            background: var(--warning-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .retry-btn:hover {
+            background: #dd6b20;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            textarea {
+                min-height: 100px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            button {
+                padding: 14px;
+                font-size: 0.875rem;
+            }
+
+            .config-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .config-panel {
+                top: 60px;
+                right: 10px;
+                max-width: calc(100vw - 40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+                margin: 0;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            .note {
+                margin-top: 24px;
+                padding: 12px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --card-bg: rgba(26, 32, 44, 0.95);
+                --text-primary: #f7fafc;
+                --text-secondary: #e2e8f0;
+            }
+
+            textarea, .config-input {
+                background: #2d3748;
+                color: #f7fafc;
+                border-color: #4a5568;
+            }
+
+            textarea::placeholder {
+                color: #718096;
+            }
+
+            .timer {
+                background: #2d3748;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+
+            .char-counter {
+                background: #2d3748;
+                color: #e2e8f0;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for better accessibility */
+        button:focus-visible,
+        textarea:focus-visible,
+        .config-input:focus-visible {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Configuration Panel -->
+    <button class="config-toggle" onclick="toggleConfig()" title="Settings">⚙️</button>
+    <div class="config-panel" id="configPanel">
+        <div class="config-label">API Gateway URL</div>
+        <input type="url" class="config-input" id="apiUrlInput" placeholder="Enter API Gateway URL">
+        <div class="config-label">Request Timeout (seconds)</div>
+        <input type="number" class="config-input" id="timeoutInput" value="60" min="30" max="300">
+        <div class="config-label">Max Retries</div>
+        <input type="number" class="config-input" id="retriesInput" value="3" min="1" max="10">
+        <button onclick="saveConfig()" style="width: 100%; padding: 8px; background: var(--primary-gradient); color: white; border: none; border-radius: 8px; font-weight: 600;">Save Settings</button>
+    </div>
+
+    <div class="container">
+        <main>
+            <section class="card" aria-label="Text to Image Generator">
+                <div class="logo-container">
+                    <img src="mylogo.png" alt="NovaMind Logo" class="logo">
+                </div>
+                <h2>NovaMind AI Image Generator</h2>
+                
+                <form id="apiForm" autocomplete="off" onsubmit="event.preventDefault(); callApi();">
+                    <div class="form-group">
+                        <label for="content">Describe Your Vision</label>
+                        <div class="input-container">
+                            <textarea 
+                                id="content" 
+                                maxlength="300" 
+                                placeholder="A majestic mountain landscape at sunset with golden light reflecting on a crystal-clear lake..." 
+                                required
+                                aria-describedby="char-counter"
+                            ></textarea>
+                            <div class="char-counter" id="char-counter">0/300</div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-container">
+                        <button type="submit" id="generateBtn">
+                            <span id="btnText">Generate Image</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="status-container">
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="status" id="statusMsg">Ready to create amazing images</div>
+                    <div class="timer" id="timer"></div>
+                    <div class="retry-container" id="retryContainer">
+                        <button class="retry-btn" onclick="retryGeneration()">Retry Generation</button>
+                    </div>
+                </div>
+                
+                <div class="image-container" id="imageContainer">
+                    <img id="outputImage" alt="Generated AI Image">
+                    <div class="image-overlay">
+                        <a href="#" class="download-btn" id="downloadBtn" download="ai-generated-image.jpg">
+                            Download Image
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>💡 Pro Tip:</strong> Be specific and descriptive in your prompts for better results. Include details about style, lighting, colors, and composition.
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        Created by <a href="https://www.linkedin.com/in/aamir-imran/" target="_blank" rel="noopener noreferrer">Aamir Imran</a> &mdash; NovaMind AI
+    </footer>
+
+    <script>
+        // Configuration management
+        class Config {
+            constructor() {
+                this.apiUrl = "https://42c82ybso6.execute-api.us-east-1.amazonaws.com/prodd/generate";
+                this.timeout = 60;
+                this.maxRetries = 3;
+                this.loadFromStorage();
+            }
+
+            loadFromStorage() {
+                try {
+                    const saved = localStorage.getItem('aiImageGenConfig');
+                    if (saved) {
+                        const config = JSON.parse(saved);
+                        this.apiUrl = config.apiUrl || this.apiUrl;
+                        this.timeout = config.timeout || this.timeout;
+                        this.maxRetries = config.maxRetries || this.maxRetries;
+                    }
+                } catch (error) {
+                    console.warn('Failed to load config from storage:', error);
+                }
+            }
+
+            save() {
+                try {
+                    localStorage.setItem('aiImageGenConfig', JSON.stringify({
+                        apiUrl: this.apiUrl,
+                        timeout: this.timeout,
+                        maxRetries: this.maxRetries
+                    }));
+                } catch (error) {
+                    console.warn('Failed to save config to storage:', error);
+                }
+            }
+
+            isValid() {
+                return this.apiUrl && 
+                       this.apiUrl.startsWith('http') && 
+                       !this.apiUrl.includes('<') && 
+                       !this.apiUrl.includes('TODO');
+            }
+        }
+
+        // Application state management
+        class AppState {
+            constructor() {
+                this.isGenerating = false;
+                this.currentRetry = 0;
+                this.lastPrompt = '';
+                this.abortController = null;
+            }
+
+            reset() {
+                this.isGenerating = false;
+                this.currentRetry = 0;
+                if (this.abortController) {
+                    this.abortController.abort();
+                    this.abortController = null;
+                }
+            }
+        }
+
+        // Initialize global objects
+        const config = new Config();
+        const appState = new AppState();
+
+        // DOM elements
+        const elements = {
+            contentTextarea: document.getElementById('content'),
+            charCounter: document.getElementById('char-counter'),
+            statusMsg: document.getElementById('statusMsg'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressBar: document.getElementById('progressBar'),
+            generateBtn: document.getElementById('generateBtn'),
+            btnText: document.getElementById('btnText'),
+            timer: document.getElementById('timer'),
+            imageContainer: document.getElementById('imageContainer'),
+            outputImage: document.getElementById('outputImage'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            retryContainer: document.getElementById('retryContainer'),
+            configPanel: document.getElementById('configPanel'),
+            apiUrlInput: document.getElementById('apiUrlInput'),
+            timeoutInput: document.getElementById('timeoutInput'),
+            retriesInput: document.getElementById('retriesInput')
+        };
+
+        // Utility functions
+        function sanitizeInput(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function validatePrompt(prompt) {
+            const errors = [];
+            
+            if (!prompt || prompt.trim().length === 0) {
+                errors.push('Please enter a description for your image.');
+            } else if (prompt.trim().length < 10) {
+                errors.push('Please provide a more detailed description (at least 10 characters).');
+            } else if (prompt.trim().length > 300) {
+                errors.push('Description is too long. Please keep it under 300 characters.');
+            }
+
+            // Check for potentially problematic content
+            const problematicWords = ['nsfw', 'explicit', 'nude', 'violence'];
+            const lowerPrompt = prompt.toLowerCase();
+            for (const word of problematicWords) {
+                if (lowerPrompt.includes(word)) {
+                    errors.push('Please use appropriate content for image generation.');
+                    break;
+                }
+            }
+
+            return errors;
+        }
+
+        function showStatus(message, type = 'info') {
+            elements.statusMsg.textContent = message;
+            elements.statusMsg.className = `status ${type}`;
+        }
+
+        function showLoading(show = true) {
+            if (show) {
+                elements.loadingSpinner.style.display = 'block';
+                elements.progressContainer.style.display = 'block';
+                elements.generateBtn.disabled = true;
+                elements.btnText.textContent = 'Generating...';
+                elements.retryContainer.style.display = 'none';
+                startProgressAnimation();
+            } else {
+                elements.loadingSpinner.style.display = 'none';
+                elements.progressContainer.style.display = 'none';
+                elements.generateBtn.disabled = false;
+                elements.btnText.textContent = 'Generate Image';
+                stopProgressAnimation();
+            }
+        }
+
+        // Progress animation
+        let progressInterval;
+        function startProgressAnimation() {
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 2;
+                if (progress > 90) progress = 90;
+                elements.progressBar.style.width = progress + '%';
+            }, 200);
+        }
+
+        function stopProgressAnimation() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                elements.progressBar.style.width = '100%';
+                setTimeout(() => {
+                    elements.progressBar.style.width = '0%';
+                }, 500);
+            }
+        }
+
+        // Timer functionality
+        let countdownInterval;
+        function startCountdown(duration) {
+            clearTimer();
+            let timer = duration;
+            
+            countdownInterval = setInterval(() => {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                elements.timer.textContent = formattedTime;
+                
+                if (--timer < 0) {
+                    clearTimer();
+                }
+            }, 1000);
+        }
+
+        function clearTimer() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            elements.timer.textContent = '';
+        }
+
+        // API functions with retry logic
+        async function makeApiRequest(url, options, retryCount = 0) {
+            try {
+                appState.abortController = new AbortController();
+                const timeoutId = setTimeout(() => appState.abortController.abort(), config.timeout * 1000);
+                
+                const response = await fetch(url, {
+                    ...options,
+                    signal: appState.abortController.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}: ${response.statusText}`);
+                }
+
+                return response;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timed out. Please try again.');
+                }
+
+                if (retryCount < config.maxRetries) {
+                    showStatus(`⚠️ Attempt ${retryCount + 1} failed. Retrying...`, 'warning');
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
+                    return makeApiRequest(url, options, retryCount + 1);
+                }
+
+                throw error;
+            }
+        }
+
+        async function callApi() {
+            const prompt = elements.contentTextarea.value.trim();
+            
+            // Validation
+            if (!config.isValid()) {
+                showStatus('⚠️ API configuration required. Please click the settings button to configure.', 'warning');
+                return;
+            }
+
+            const validationErrors = validatePrompt(prompt);
+            if (validationErrors.length > 0) {
+                showStatus(validationErrors[0], 'warning');
+                elements.contentTextarea.focus();
+                return;
+            }
+
+            // Reset state
+            appState.reset();
+            appState.isGenerating = true;
+            appState.lastPrompt = prompt;
+            elements.imageContainer.style.display = 'none';
+
+            const payload = {
+                prompt: prompt,
+                negative_prompt: "blurry, low quality, person, human, face, text, watermark, ugly, distorted",
+                width: 512,
+                height: 512,
+                num_images_per_prompt: 1,
+                num_inference_steps: 50,
+                guidance_scale: 10
+            };
+
+            showLoading(true);
+            showStatus('🎨 Creating your masterpiece...', 'info');
+            startCountdown(120);
+
+            try {
+                // POST the prompt — Endpoint_Call_Function returns the image URL directly
+                const response = await makeApiRequest(config.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                console.log('RAW API RESPONSE:', JSON.stringify(data));
+
+                // POST only starts generation — now poll GET until image is ready
+                showStatus('🎨 Generating your image, please wait...', 'info');
+
+                // Get the current latest image key BEFORE generation starts
+                // so we can detect when a genuinely NEW image appears
+                let previousKey = await getLatestImageKey(config.apiUrl);
+                console.log('Previous image key:', previousKey);
+
+                const imageUrl = await pollForImage(config.apiUrl, 120, 5000, previousKey);
+
+                if (!imageUrl) {
+                    throw new Error('No image URL found in server response');
+                }
+
+                showStatus('⏳ Loading your image...', 'info');
+                await displayImage(imageUrl);
+
+            } catch (error) {
+                console.error('API Error:', error);
+                handleError(error);
+            }
+        }
+
+        // Get the S3 key of the current latest image (before generation starts)
+        async function getLatestImageKey(url) {
+            try {
+                const res = await fetch(url, { method: 'GET' });
+                // 404 means bucket is empty — no previous image, that's fine
+                if (!res.ok) return null;
+                const text = await res.text();
+                const match = text.match(/generated_images\/[^?]+/);
+                return match ? match[0] : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Poll the GET endpoint every intervalMs until a NEW image appears
+        async function pollForImage(url, maxWaitSeconds, intervalMs, previousKey) {
+            const maxAttempts = Math.floor((maxWaitSeconds * 1000) / intervalMs);
+            // Pass previous key so Lambda skips it and only returns a new image
+            const excludeParam = previousKey ? `?exclude=${encodeURIComponent(previousKey)}` : '';
+            const getUrl = `${url}${excludeParam}`;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                const elapsed = attempt * (intervalMs / 1000);
+                showStatus(`🎨 Generating... ${elapsed}s`, 'info');
+
+                await new Promise(resolve => setTimeout(resolve, intervalMs));
+
+                try {
+                    const res = await fetch(getUrl, { method: 'GET' });
+                    // 202 = image not ready yet, 404 = bucket empty, both mean keep polling
+                    if (res.status === 202 || res.status === 404) {
+                        console.log(`Poll ${attempt}: image still pending`);
+                        continue;
+                    }
+                    if (!res.ok) {
+                        console.warn(`Poll ${attempt}: HTTP ${res.status}`);
+                        continue;
+                    }
+
+                    const text = await res.text();
+                    console.log(`Poll ${attempt} response:`, text);
+
+                    let imageUrl = null;
+
+                    // Try JSON parse first
+                    try {
+                        const json = JSON.parse(text);
+                        // Could be wrapped: { body: "{\"cloudFrontUrl\":\"...\"}" }
+                        if (json.body) {
+                            try {
+                                const inner = typeof json.body === 'string' ? JSON.parse(json.body) : json.body;
+                                imageUrl = inner.cloudFrontUrl || inner.imageUrl || inner.url;
+                            } catch {
+                                if (typeof json.body === 'string' && json.body.startsWith('http')) {
+                                    imageUrl = json.body;
+                                }
+                            }
+                        }
+                        if (!imageUrl) {
+                            imageUrl = json.cloudFrontUrl || json.imageUrl || json.url;
+                        }
+                    } catch {
+                        // Plain text URL
+                        if (text.trim().startsWith('http')) {
+                            imageUrl = text.trim();
+                        }
+                    }
+
+                    if (imageUrl && imageUrl.startsWith('http')) {
+                        console.log('Image URL found:', imageUrl);
+                        return imageUrl;
+                    }
+
+                } catch (err) {
+                    console.warn(`Poll ${attempt} error:`, err.message);
+                }
+            }
+
+            throw new Error(`Image generation timed out after ${maxWaitSeconds}s. Please try again.`);
+        }
+
+        async function displayImage(imageUrl) {
+            console.log('Loading image from URL:', imageUrl);
+
+            return new Promise((resolve, reject) => {
+                elements.outputImage.onload = function() {
+                    showLoading(false);
+                    showStatus('✨ Your image is ready!', 'success');
+                    clearTimer();
+                    elements.imageContainer.style.display = 'block';
+                    appState.reset();
+                    elements.downloadBtn.href = imageUrl;
+                    elements.downloadBtn.download = `ai-generated-${Date.now()}.jpg`;
+                    resolve();
+                };
+
+                elements.outputImage.onerror = function() {
+                    reject(new Error('Image failed to load. Please try again.'));
+                };
+
+                // Set src directly — img tag works fine with pre-signed S3 URLs
+                elements.outputImage.src = imageUrl;
+            });
+        }
+
+        function handleError(error) {
+            showLoading(false);
+            const displayMsg = error.message || 'An unknown error occurred';
+            showStatus(`❌ ${displayMsg}`, 'error');
+            console.error('Generation error:', error);
+            clearTimer();
+            appState.isGenerating = false;
+            
+            if (appState.currentRetry < config.maxRetries) {
+                elements.retryContainer.style.display = 'block';
+            }
+        }
+
+        function retryGeneration() {
+            if (appState.lastPrompt && appState.currentRetry < config.maxRetries) {
+                appState.currentRetry++;
+                elements.contentTextarea.value = appState.lastPrompt;
+                callApi();
+            }
+        }
+
+        // Configuration panel functions
+        function toggleConfig() {
+            const panel = elements.configPanel;
+            const isVisible = panel.style.display === 'block';
+            
+            if (isVisible) {
+                panel.style.display = 'none';
+            } else {
+                // Load current config into inputs
+                elements.apiUrlInput.value = config.apiUrl;
+                elements.timeoutInput.value = config.timeout;
+                elements.retriesInput.value = config.maxRetries;
+                panel.style.display = 'block';
+            }
+        }
+
+        function saveConfig() {
+            const newApiUrl = elements.apiUrlInput.value.trim();
+            const newTimeout = parseInt(elements.timeoutInput.value);
+            const newRetries = parseInt(elements.retriesInput.value);
+
+            // Validation
+            if (!newApiUrl || !newApiUrl.startsWith('http')) {
+                showStatus('⚠️ Please enter a valid API URL', 'warning');
+                return;
+            }
+
+            if (newTimeout < 30 || newTimeout > 300) {
+                showStatus('⚠️ Timeout must be between 30 and 300 seconds', 'warning');
+                return;
+            }
+
+            if (newRetries < 1 || newRetries > 10) {
+                showStatus('⚠️ Max retries must be between 1 and 10', 'warning');
+                return;
+            }
+
+            // Save configuration
+            config.apiUrl = newApiUrl;
+            config.timeout = newTimeout;
+            config.maxRetries = newRetries;
+            config.save();
+
+            elements.configPanel.style.display = 'none';
+            showStatus('✅ Configuration saved successfully', 'success');
+        }
+
+        // Character counter functionality
+        elements.contentTextarea.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            const maxLength = this.getAttribute('maxlength');
+            elements.charCounter.textContent = `${currentLength}/${maxLength}`;
+            
+            if (currentLength > maxLength * 0.9) {
+                elements.charCounter.style.color = '#f56565';
+            } else if (currentLength > maxLength * 0.7) {
+                elements.charCounter.style.color = '#ed8936';
+            } else {
+                elements.charCounter.style.color = '#4a5568';
+            }
+
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 300) + 'px';
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!elements.generateBtn.disabled) {
+                    callApi();
+                }
+            }
+
+            if (e.key === 'Escape') {
+                elements.configPanel.style.display = 'none';
+            }
+        });
+
+        // Form validation feedback
+        elements.contentTextarea.addEventListener('blur', function() {
+            const prompt = this.value.trim();
+            if (prompt.length > 0 && prompt.length < 10) {
+                showStatus('💡 Try adding more details for better results', 'warning');
+            }
+        });
+
+        // Click outside to close config panel
+        document.addEventListener('click', function(e) {
+            const panel = elements.configPanel;
+            const toggle = document.querySelector('.config-toggle');
+            
+            if (panel.style.display === 'block' && 
+                !panel.contains(e.target) && 
+                !toggle.contains(e.target)) {
+                panel.style.display = 'none';
+            }
+        });
+
+        // Initialize character counter
+        elements.contentTextarea.dispatchEvent(new Event('input'));
+
+        // Initialize configuration inputs
+        elements.apiUrlInput.value = config.apiUrl;
+        elements.timeoutInput.value = config.timeout;
+        elements.retriesInput.value = config.maxRetries;
+
+        // Show initial status
+        if (!config.isValid()) {
+            showStatus('⚙️ Click the settings button to configure your API', 'warning');
+        }
+    </script>
+</body>
+</html>
+

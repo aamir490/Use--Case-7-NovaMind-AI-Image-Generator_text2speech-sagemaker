@@ -1,0 +1,103 @@
+1.	After Logging Into AWS Console, Go To Amazon SageMaker AI.
+
+1a. In SageMaker AI, Go To Studio And Create A User With Default Settings.
+
+1b. Launch Studio To Create JupyterLab Space. Configuration Instance: ml.t3.large, Storage: 25GB.
+
+1c. Open Jupyter Notebook, Import “jupyter_notebook.ipynb” File From Desktop.
+
+1d. You need to add the necessary S3 permissions to your SageMaker execution role:
+{/opt/conda/lib/python3.12/site-packages/boto3/s3/transfer.py
+/opt/conda/lib/python3.12/site-packages/s3transfer/futures.py
+/opt/conda/lib/python3.12/site-packages/s3transfer/tasks.py
+/opt/conda/lib/python3.12/site-packages/botocore/client.py
+/opt/conda/lib/python3.12/site-packages/sagemaker/model.py
+/opt/conda/lib/python3.12/site-packages/sagemaker/utils.py
+/opt/conda/lib/python3.12/site-packages/boto3/s3/inject.py}
+    i.    Add Permissions Through the IAM Console
+    ii.   Go to the AWS IAM Console
+    iii.  Navigate to Roles
+    iv.   Search for and select AmazonSageMaker-ExecutionRole-20250717T000062
+    v.    Click "Add permissions" and then "Create inline policy"
+    vi.   Add S3FullAccess Policy
+    vii.  Click Save.
+
+1e. Run The Code Starting From Step 1 Until Step 4 At Least, Then Continue Running All Code Sections.
+
+2. Now, Go To AWS Lambda And Create Three Function. While Configuring, Choose Python 3.10.
+
+2a. Endpoint_Call_Function: Used To Call Sagemaker Endpoint. General Configuration: Ram: 512MB, Timeout: 5 Minutes. Python v 3.10
+    Environment Variables: 
+        ENDPOINT_NAME: cloudage-endpoint-text-to-image-model-t-2025-07-17-08-52-23-824
+        BUCKET_NAME: cloudage-text-to-image-webapp
+    Permissions:
+        S3:FullAccess
+        AmazonSageMakerFullAccess
+
+    Add Layer: PillowLayer
+    i. Go To Lambada -> Layers -> Add Layer -> Upload pillowlayer.zip -> Runtime Pyton v3.10 x86_64 -> Save.
+    ii. Go To Lambda -> Functions -> Endpoint_Call_Functions -> Add Layer -> Custom Layer -> Select Pillow Layer -> Save.
+    
+    
+    Start_Processing_Function: Used To Start The Processing Of The Image. General Configuration: Ram: 512MB, Timeout: 5 Minutes. Python v 3.11
+    Environment Variables:
+        PROCESSING_LAMBDA_NAME: Endpoint_Call_Function
+        BUCKET_NAME: cloudage-text-to-image-webapp
+    Permissions:
+        S3:FullAccess
+        AmazonLambda_FullAccess
+    
+
+    Display_Image_Function: Used To Dispatch The Image To WebApp. General Configuration: Ram: 512MB, Timeout: 5 Minutes. Python v 3.11
+    Environment Variables:
+        BUCKET_NAME: cloudage-text-to-image-webapp
+    Permissions:
+        S3:FullAccess
+        CloudFrontFullAccess
+
+
+2b. Deploy Lambda Function. 
+
+
+3.	Now, Go To AWS Console, Search API Gateway, And Choose REST API.
+
+3a. Click On Import And Upload “generative-ai-api-prod-swagger-apigateway.json”.
+
+3b. Review Resources And Stages.
+
+3c. i. From The Dropdown In POST Resource, Click On “Integration Request” And Replace The Lambda Function With Start_Processing_Function.
+    ii. From The Dropdown In GET Resource, Click On “Integration Request” And Replace The Lambda Function With Display_Image_Function.
+
+3d. If You Already Made Changes In The Code On Desktop, Then then only Check If It Is Applied.
+
+3e. Deploy API And Create A New Stage Named According To Your Organisation’s Naming Convention.
+
+GenAI Backend Is Ready. Let’s Prepare The Frontend.
+
+
+4.	On Your Desktop:
+
+4a. Edit “index.html”. Change → var apiGatewayUrl = “{API_GATEWAY_POST_URL}”; (Line Number: 134) "this.apiUrl"
+
+4b. Upload “logo.jpeg” And “index.html” To The S3 Bucket That You Will Choose In CloudFront.
+	
+    
+5.	Go To AWS CloudFront, Create A Distribution, Specify Origin As S3, And Choose The Bucket Where You Uploaded “index.html”.
+
+5a. Go To CloudFront Distribution → General → Edit → Set Default Root Object To “index.html”.
+
+5b. Go To Your CloudFront Distribution → Origins → Check “cloudage-gen-ai…” → Edit → Copy S3 Bucket Policy.
+
+5c. Go To S3 Bucket Containing “index.html” And Edit The S3 Bucket Policy.
+
+5d. Or Paste The S3 Policy From Desktop. Remember To Change The ARN.
+
+5e. Wait Until CloudFront Distribution Deploys To All Edge Locations (It May Take 10 Minutes Depending On The Size Of The Web Application).
+
+5f. Go To CloudFront Distribution → Invalidations → Create Invalidation → Paste “/*”.
+
+5g. Once Deployed, Go To The URL (Distribution Domain Name).
+
+Ask Bigger Questions. Remember This Is A FM Model Named Stable Diffusion Trained On AWS Dataset And You Can Deploy Another Model From SageMaker Ai (Many Options); However, Your Organisation Will Need To Bear The Cost.
+
+Great Work! Project Completed. All Praise Be To Almighty GOD Alone.
