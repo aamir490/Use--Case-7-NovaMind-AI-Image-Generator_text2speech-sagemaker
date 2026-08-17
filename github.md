@@ -140,6 +140,9 @@ git add index.html endpoint_call_function.py start_process_function.py display_i
 # Commit with message
 git commit -m "NovaMind AI Image Generator - AWS Stable Diffusion text-to-image app"
 
+# check branch
+git branch
+
 # Push to GitHub and set upstream tracking
 git push -u origin master
 ```
